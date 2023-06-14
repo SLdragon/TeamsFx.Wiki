@@ -1,7 +1,11 @@
 # Introduction
-If you're looking to integrate your existing API service with Teams App, our `api2teams` CLI tool can help you seamlessly convert your APIs from OpenAPI spec file into a command bot Teams App with ease.
+> The `api2teams` and its generated project template is currently under active development. Report any issues to us [here](https://github.com/OfficeDev/TeamsFx/issues/new/choose)
+ 
+`api2teams` is a command line tool to generate a complete conversational style command and response [Teams application](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/command-bot-in-teams) based on your Open API specification file and represent the API response in the form of [Adaptive Cards](https://learn.microsoft.com/microsoftteams/platform/task-modules-and-cards/cards/cards-reference#adaptive-card).
 
-# Prerequisite
+`api2teams` is the best way to start integrating your APIs with Teams conversational experience.
+
+## Prerequisite
 Before running this CLI and deploying your generated Teams App to Azure or your local development machine, please ensure that you have the following prerequisites in place:
 
 - [Node.js](https://nodejs.org/), supported versions: 14, 16, 18
@@ -10,55 +14,13 @@ Before running this CLI and deploying your generated Teams App to Azure or your 
 - [Option] If you want to deploy this APP to Azure, you also need an Azure subscription. If you don't have an Azure subscription, [create a free account](https://azure.microsoft.com/en-us/free/) before you begin
 
 
-# Quick Start
+## Quick start
 
-- Install the CLI
-  ```
-  npm install @microsoft/api2teams@latest -g
-  ```
+- Install `api2teams` with npm: `npm install @microsoft/api2teams@latest -g`
+- Prepare the Open API specification. If you don't currently have one, start with a sample we provided by saving a copy of the [sample-open-api-spec.yml](https://raw.githubusercontent.com/OfficeDev/TeamsFx/api2teams/packages/api2teams/sample-spec/sample-open-api-spec.yml) to your local disk.
+- Convert the Open API spec to a Teams app, assuming you are using the `sample-open-api-spec.yml`: `api2teams sample-open-api-spec.yml`
 
-- Download [sample-open-api-spec.yml](https://github.com/OfficeDev/TeamsFx/blob/api2teams/packages/api2teams/sample-spec/sample-open-api-spec.yml) to current working directory
-
-- Run the command below to convert `sample-open-api-spec.yml` file to Teams App, it will generate teams project to `generated-teams-app` folder
-  ```
-  api2teams sample-open-api-spec.yml
-  ```
-
-- You can specify which folder to generate teams project as below
-  ```
-  api2teams sample-open-api-spec.yml -o my-custom-teams-app-folder
-  ```
-
-- If you want to overwrite the output folder, you can use `-f` parameters
-  ```
-  api2teams sample-open-api-spec.yml -o my-custom-teams-app-folder -f
-  ```
-
-- If you have other personal swagger yaml files, you can also use this CLI tool to covert them.
-
-# Run Generated Teams App
-
-- Open generated folder in VSCode, and make sure you have installed [Teams Toolkit >= 5.0.0](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension).
-
-- Click F5 in VSCode to run the Teams App to view the result (Below is the example of teams app converted by [test4.yml](./tests/e2e/swagger-files/test4.yml) file)
-
-  - Send message `GET /pets/1` to Bot, bot will send a response adaptive card:
-
-    ![](https://github.com/OfficeDev/TeamsFx/wiki/api2teams/workflow1.png)
-
-  - Send message `GET /pets` to Bot, it will first send request a request adaptive card:
-
-    ![](https://github.com/OfficeDev/TeamsFx/wiki/api2teams/workflow2.png)
-
-  - Input value in the request adaptive card, and then click GET button, it will send back response adaptive card:
-
-    ![](https://github.com/OfficeDev/TeamsFx/wiki/api2teams/workflow3.png)
-
-  - Send message `GET /pets?limit=1`, it will send back response adaptive card directly:
-
-    ![](https://github.com/OfficeDev/TeamsFx/wiki/api2teams/workflow4.png)
-
-# CLI Usage
+## Available commands and options
 
 The CLI name is `api2teams`. Usage is as below:
 
@@ -77,7 +39,7 @@ Options:
   -h, --help             display help for command
 ```
 
-User can input below command to generate Teams App to default or specific folder:
+You can input below command to generate Teams App to default or specific folder:
 
 ```bash
 api2teams sample-open-api-spec.yml # generate teams app to default folder ./generated-teams-app
@@ -87,9 +49,18 @@ api2teams -h # show help message
 api2teams -v # show version information
 ```
 
-# Converted Teams App Folder Structure
+## Getting started with the generated Teams app
 
-The converted app is a normal command bot TeamsFx project that will contain following files/folders:
+- Open the generated project in [Visual Studio Code](https://code.visualstudio.com/) and make sure you have the latest [Teams Toolkit](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension) (version 5.0.0 or higher) installed.
+
+- Follow the instruction provided in the `README.md` for the generated project to get started. For the Teams app converted by the given sample Open API spec, you will be able to run a `GET /pets/1` command in Teams and a bot will return an Adaptive Card as response.
+
+    ![response](https://github.com/OfficeDev/TeamsFx/wiki/api2teams/workflow1.png)
+
+## What's included in the template
+
+The app template is generated based on a command bot project that's compatible with Teams Toolkit project structures.
+
 | Folder / File | Contents |
 | - | - |
 | `teamsapp.yml` | Main project file describes your application configuration and defines the set of actions to run in each lifecycle stages |
@@ -100,42 +71,37 @@ The converted app is a normal command bot TeamsFx project that will contain foll
 | `infra/` | Templates for provisioning Azure resources |
 | `src/` | The source code for the application |
 
-In the src folder, there are 4 subfolders and a index.ts file insdie:
+The files in following folder can be customized and demonstrate an example implementation to ge you started.
 
-* adaptiveCards folder
-    - This folder contains adaptive card generated by Convert Tool based on APIs. Each API will generate two adaptive cards, one is `*RequestCard.json`, and another is `*ResponseCard.json`. Request card is for user to input parameters and click button to send request, and response card is used to render api response data.
-    > Using this pattern is more clear than use component name (although it may produce duplicated cards), because component name can be used by multiple apis, and it is not easy for user to know which adaptive card is for specific api
+| Folder / File | Contents |
+| - | - |
+|`src/adaptiveCards`|This folder contains adaptive card generated by `api2teams` based on the Open API Specification. Each API will generate two adaptive cards, one is `*RequestCard.json`, and another is `*ResponseCard.json`. Request card is for user to input parameters and click button to send request, and response card is used to render api response data. Using this pattern is more clear than use component name (although it may produce duplicated cards), because component name can be used by multiple apis, and it is not easy for user to know which adaptive card is for specific api|
+|`src/apis`|This folder contains two `.ts` file, one is for mock api calls (`mockApiProvider.ts`) and another is for real api calls (`realApiProvider.ts`). For real api calls, you need to update these files to call backend service.|
+|`src/cardActions`|This folder contains [card action handlers](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/workflow-bot-in-teams?tabs=JS#card-action-handler), when user click action button in the request adaptive card, it would use these handlers to get response and render response adaptive card.|
+|`src/commands`|This folder contains bot [command handlers](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/command-bot-in-teams#command-and-response), when user send messages, it will match the api, and send back request adaptive card. There is a special command handler which named `helpCommandHandler` which is used to show help messages.|
+|`src/index.ts`|Index file using `restify` as web service framework to host bot server, and register command handlers and action handlers for bot to handle use messages and button clicking event. |
 
-* apis folder
-    - This folder contains two ts file, one is for mock api calls (mockApiProvider.ts) and another is for real api calls (realApiProvider.ts). For real api calls, user need to manually update these files to call real backend service
-
-* cardActions folder
-    - This folder contains card action handlers, when user click action button in the request adaptive card, it would use these handlers to get response and render response adaptive card.
-
-* commands folder
-    - This folder contains bot command handlers, when user send messages, it will match the api, and send back request adaptive card. There is a special command handler which named `helpCommandHandler` which is used to show help messages.
-
-* index.ts file
-    - Index file using `restify` as web service framework to host bot server, and register command handlers and action handlers for bot to handle use messages and button clicking event. 
-
-Below is workflow when user input command message with all required parameters:
+## How it works
+Below is a simple command and response flow chart:
 
 ![](https://github.com/OfficeDev/TeamsFx/wiki/api2teams/flow2.png)
 
 
-In the event that a user inputs a command message with missing required parameters, the following workflow is triggered:
+In case the command requires additional input, the following flow will be triggered:
+
 ![](https://github.com/OfficeDev/TeamsFx/wiki/api2teams/flow1.png)
 
-# Customize the Project
-To learn more about the template, [visit the documentation on GitHub](https://aka.ms/teamsfx-command-new). You can find more scenarios like:
+## Extend the template
+Congratulations, you've just had your API integrated with Teams! Now you can further extend this template that fits with your business requirements:
 
 - [Customize the trigger pattern](https://aka.ms/teamsfx-command-new#customize-the-trigger-pattern)
 - [Customize the Adaptive Card with dynamic content](https://aka.ms/teamsfx-command-new#how-to-build-command-response-using-adaptive-card-with-dynamic-content)
 - [Change the way to initialize the bot](https://aka.ms/teamsfx-command-new#customize-initialization)
 - [Connect to an existing API](https://aka.ms/teamsfx-command-new#connect-to-existing-api)
 - [Access Microsoft Graph](https://aka.ms/teamsfx-add-sso-new)
+- [Add notifications to the project](https://aka.ms/teamsfx-notification-new)
 
-# Current Limitations
+## Current Limitations
 1. Only OpenAPI version 3.0.0 or higher is supported.
 1. Authorization properties inside OpenAPI spec is not supported
 1. Only GET operations are supported.
@@ -145,7 +111,7 @@ To learn more about the template, [visit the documentation on GitHub](https://ak
 1. Adaptive cards do not support file uploads, so if an API contains file uploads, it cannot be converted to adaptive card.
 1. Due to Teams limitations, command intellisense can only contain a maximum of 10 items.
 
-# References
+## References
 - [Teams Toolkit extension](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 - [Adaptive card official site](https://adaptivecards.io/)
 - [Adaptive card designer](https://adaptivecards.io/designer)
